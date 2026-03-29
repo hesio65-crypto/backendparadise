@@ -129,7 +129,7 @@ app.post("/criar-pix", async (req, res) => {
         reference: txid,
         source: "api_externa",
         customer: cliente,
-        postback_url: "https://SEU-DOMINIO/webhook/paradise"
+        postback_url: "https://backendparadise-production.up.railway.app/webhook/paradise"
       },
       {
         headers: {
