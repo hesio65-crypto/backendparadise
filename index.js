@@ -26,7 +26,8 @@ const planos = {
   5: 34,
   7: 38,
   10: 51,
-  20: 97
+  20: 97,
+  50: 251 // ✅ NOVO PLANO
 };
 
 /* =========================
@@ -61,15 +62,9 @@ function gerarCPF() {
   return cpf.join("") + d1 + d2;
 }
 
-function gerarClienteFake(txid) {
-  return {
-    name: "Cliente Proxy",
-    email: `cliente_${txid}@proxy.com`,
-    phone: "119" + Math.floor(10000000 + Math.random() * 90000000),
-    document: gerarCPF()
-  };
-}
-
+/* =========================
+   RECARREGAR PROXY
+========================= */
 async function recarregarProxy(subuser_id, gigas) {
   const auth = await axios.post(
     "https://api.dataimpulse.com/reseller/user/token/get",
@@ -101,7 +96,7 @@ async function recarregarProxy(subuser_id, gigas) {
    CRIAR PIX
 ========================= */
 app.post("/criar-pix", async (req, res) => {
-  const { subuser_id, gigas } = req.body;
+  const { subuser_id, gigas, telefone } = req.body; // ✅ NOVO
 
   if (!planos[gigas]) {
     return res.json({ erro: "plano inválido" });
@@ -109,13 +104,20 @@ app.post("/criar-pix", async (req, res) => {
 
   const valor = planos[gigas];
   const txid = gerarTxid();
-  const cliente = gerarClienteFake(txid);
+
+  const cliente = {
+    name: "Cliente Proxy",
+    email: `cliente_${txid}@proxy.com`,
+    phone: telefone || "11999999999", // ✅ USA WHATSAPP
+    document: gerarCPF()
+  };
 
   vendas.push({
     txid,
     subuser_id,
     gigas,
     valor,
+    telefone, // ✅ SALVA WHATSAPP
     status: "PENDENTE",
     data: new Date()
   });
